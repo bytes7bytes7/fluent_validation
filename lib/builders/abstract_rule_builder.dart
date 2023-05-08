@@ -3,7 +3,7 @@ import 'package:fluent_validation/fluent_validation.dart';
 /// Holds a list of rules to match against
 class AbstractRuleBuilder<E> {
   AbstractRuleBuilder({
-    this.useKeyAsElementName = false,
+    this.useKeyAsElementName = true,
     this.expression,
     required this.key,
   });
@@ -54,27 +54,37 @@ class AbstractRuleBuilder<E> {
         code: "null");
   }
 
-  /// Checks if the object a string and is not empty
+  /// Checks if the object is a string or an iterable and is not empty
   AbstractRuleBuilder notEmpty({String? message}) {
-    return must(
-        (dynamic dyn) => dyn is String && dyn.isNotEmpty,
+    return must((dynamic dyn) {
+      if (dyn is String || dyn is Iterable) {
+        return dyn.isNotEmpty;
+      }
+
+      return false;
+    },
         message != null
             ? message
             : useKeyAsElementName
                 ? '$key must not be empty'
-                : "String must not be empty",
+                : "Value must not be empty",
         code: "empty");
   }
 
-  /// Checks if the object a string and is empty
+  /// Checks if the object is a string or an Iterable and is empty
   AbstractRuleBuilder empty({String? message}) {
-    return must(
-        (dynamic dyn) => dyn is String && dyn.isEmpty,
+    return must((dynamic dyn) {
+      if (dyn is String || dyn is Iterable) {
+        return dyn.isEmpty;
+      }
+
+      return false;
+    },
         message != null
             ? message
             : useKeyAsElementName
                 ? '$key must be empty'
-                : "String must be empty",
+                : "Value must be empty",
         code: "notEmpty");
   }
 
@@ -103,40 +113,56 @@ class AbstractRuleBuilder<E> {
         code: "notEqual");
   }
 
-  /// Checks if the object is a String and is inbetween two lengthes
+  /// Checks if the object is a string or an Iterable and its length is in range
   AbstractRuleBuilder length(int min, int max, {String? message}) {
-    return must(
-        (dynamic dyn) =>
-            dyn is String && dyn.length >= min && dyn.length <= max,
+    return must((dynamic dyn) {
+      if (dyn is String || dyn is Iterable) {
+        return dyn.length >= min && dyn.length <= max;
+      }
+
+      return false;
+    },
         message != null
             ? message
             : useKeyAsElementName
-                ? "$key must between $min and $max characters long"
-                : "String must between $min and $max characters long",
+                ? "Length of $key must be between $min and $max"
+                : "Length of the value must be between $min and $max",
         code: "notLength");
   }
 
-  /// Checks if the object is a String and is at least a minimum length
+  /// Checks if the object is a string or an Iterable and its length is
+  /// greater or equal to a specified number
   AbstractRuleBuilder minLength(int min, {String? message}) {
-    return must(
-        (dynamic dyn) => dyn is String && dyn.length >= min,
+    return must((dynamic dyn) {
+      if (dyn is String || dyn is Iterable) {
+        return dyn.length >= min;
+      }
+
+      return false;
+    },
         message != null
             ? message
             : useKeyAsElementName
-                ? "$key must be more than or equal to $min characters long"
-                : "String must be more than or equal to $min characters long",
+                ? "Length of $key must be greater or equal to $min"
+                : "Length of the value must be greater or equal to $min",
         code: "notMinLength");
   }
 
-  /// Checks if the object is a String and is at below a maximum length
+  /// Checks if the object is a string or an Iterable and its length is
+  /// less or equal to a specified number
   AbstractRuleBuilder maxLength(int max, {String? message}) {
-    return must(
-        (dynamic dyn) => dyn is String && dyn.length <= max,
+    return must((dynamic dyn) {
+      if (dyn is String || dyn is Iterable) {
+        return dyn.length <= max;
+      }
+
+      return false;
+    },
         message != null
             ? message
             : useKeyAsElementName
-                ? "$key must be less than or equal to $max characters long"
-                : "String must be less than or equal to $max characters long",
+                ? "Length of $key must be less or equal to $max"
+                : "length of the value must be less or equal to $max",
         code: "notMaxLength");
   }
 
